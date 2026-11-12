@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architecture Diagram | Containerized Observability Stack on Azure</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --primary: #0284c7;
+      --accent: #2563eb;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .header {
+      max-width: 1240px;
+      width: 100%;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .title-group h1 {
+      font-size: 1.5rem;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .title-group p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    .badges {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .badge {
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .diagram-container {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      max-width: 1240px;
+      width: 100%;
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="title-group">
+      <h1>☁️ Containerized Monitoring & Observability Stack</h1>
+      <p>System Architecture & Container Topology: Local Docker Network & Serverless Azure Container Instances</p>
+    </div>
+    <div class="badges">
+      <span class="badge">Docker Compose</span>
+      <span class="badge">FastAPI + Redis</span>
+      <span class="badge">Prometheus 5s Scrape</span>
+      <span class="badge">Grafana Dashboards</span>
+      <span class="badge">Azure ACI (southeastasia)</span>
+    </div>
+  </div>
+
+  <div class="diagram-container">
+    <svg viewBox="0 0 1200 820" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Gradients -->
+        <linearGradient id="bgCanvas" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ffffff" />
+          <stop offset="100%" stop-color="#fafafa" />
+        </linearGradient>
+        
+        <linearGradient id="dockerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#f0f9ff" />
+          <stop offset="100%" stop-color="#e0f2fe" />
+        </linearGradient>
+
+        <linearGradient id="azureGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#f8fafc" />
+          <stop offset="100%" stop-color="#f1f5f9" />
+        </linearGradient>
+
+        <!-- Drop Shadows -->
+        <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.06"/>
+        </filter>
+
+        <!-- Arrow Markers -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 8 5 L 0 9 z" fill="#0284c7" />
+        </marker>
+        <marker id="arrowRed" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 8 5 L 0 9 z" fill="#ef4444" />
+        </marker>
+        <marker id="arrowOrange" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 8 5 L 0 9 z" fill="#ea580c" />
+        </marker>
+        <marker id="arrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 8 5 L 0 9 z" fill="#16a34a" />
+        </marker>
+      </defs>
+
+      <!-- Background Canvas -->
+      <rect x="0" y="0" width="1200" height="820" rx="12" fill="url(#bgCanvas)" />
+
+      <!-- ===================================================================== -->
+      <!-- SECTION 1: CLIENT ACCESS / HOST LAYER                                 -->
+      <!-- ===================================================================== -->
+      <rect x="40" y="30" width="1120" height="90" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#cardShadow)"/>
+      <text x="60" y="60" font-family="-apple-system, sans-serif" font-size="14" font-weight="700" fill="#0f172a">👤 DevOps Engineer / SRE Traffic Ingestion</text>
+      <text x="60" y="82" font-family="-apple-system, sans-serif" font-size="12" fill="#64748b">Host Machine Browser &amp; Automated Testing Scripts (load_test.sh / UI Traffic Simulator)</text>
+
+      <!-- Host Access Points -->
+      <rect x="490" y="48" width="180" height="50" rx="8" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.2"/>
+      <text x="505" y="70" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#0284c7">App UI &amp; CRUD API</text>
+      <text x="505" y="86" font-family="monospace" font-size="11" fill="#0369a1">http://localhost:8000</text>
+
+      <rect x="700" y="48" width="190" height="50" rx="8" fill="#fee2e2" stroke="#f87171" stroke-width="1.2"/>
+      <text x="715" y="70" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#dc2626">Prometheus Web UI</text>
+      <text x="715" y="86" font-family="monospace" font-size="11" fill="#991b1b">http://localhost:9090</text>
+
+      <rect x="920" y="48" width="180" height="50" rx="8" fill="#ffedd5" stroke="#fb923c" stroke-width="1.2"/>
+      <text x="935" y="70" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#c2410c">Grafana Dashboards</text>
+      <text x="935" y="86" font-family="monospace" font-size="11" fill="#9a3412">http://localhost:3000</text>
+
+      <!-- ===================================================================== -->
+      <!-- SECTION 2: DOCKER COMPOSE BRIDGE NETWORK LAYER                        -->
+      <!-- ===================================================================== -->
+      <rect x="40" y="150" width="1120" height="380" rx="16" fill="url(#dockerGrad)" stroke="#38bdf8" stroke-width="2" stroke-dasharray="6,4"/>
+      <text x="60" y="176" font-family="-apple-system, sans-serif" font-size="15" font-weight="800" fill="#0369a1">🐳 Docker Custom Bridge Network: observability-net (172.28.0.0/16)</text>
+      <text x="60" y="195" font-family="-apple-system, sans-serif" font-size="12" fill="#0284c7">Subnet: 172.28.0.0/16 &#8226; Auto-DNS Resolution</text>
+      <text x="1130" y="178" text-anchor="end" font-family="-apple-system, sans-serif" font-size="11" fill="#0284c7">Explicit Memory Limits &#8226; Volume Persistence</text>
+
+      <!-- 1. notes-app -->
+      <g filter="url(#cardShadow)">
+        <rect x="70" y="225" width="220" height="150" rx="10" fill="#ffffff" stroke="#0284c7" stroke-width="1.8"/>
+        <rect x="70" y="225" width="220" height="32" rx="10" fill="#0284c7"/>
+        <text x="82" y="246" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#ffffff">notes-app (FastAPI)</text>
+        <text x="82" y="275" font-family="monospace" font-size="11" font-weight="600" fill="#0f172a">IP: 172.28.0.4:8000</text>
+        <text x="82" y="295" font-family="-apple-system, sans-serif" font-size="11" fill="#64748b">&#8226; Non-root user (appuser)</text>
+        <text x="82" y="313" font-family="-apple-system, sans-serif" font-size="11" fill="#64748b">&#8226; Exposes /metrics &amp; /health</text>
+        <text x="82" y="331" font-family="-apple-system, sans-serif" font-size="11" fill="#64748b">&#8226; Memory Limit: 256M</text>
+        <rect x="80" y="344" width="100" height="18" rx="4" fill="#dbeafe"/>
+        <text x="85" y="357" font-family="monospace" font-size="10" fill="#1d4ed8">Host: :8000</text>
+      </g>
+
+      <!-- 2. redis -->
+      <g filter="url(#cardShadow)">
+        <rect x="340" y="225" width="200" height="150" rx="10" fill="#ffffff" stroke="#dc2626" stroke-width="1.8"/>
+        <rect x="340" y="225" width="200" height="32" rx="10" fill="#dc2626"/>
+        <text x="352" y="246" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#ffffff">redis (Cache/Store)</text>
+        <text x="352" y="275" font-family="monospace" font-size="11" font-weight="600" fill="#0f172a">IP: 172.28.0.2:6379</text>
+        <text x="352" y="295" font-family="-apple-system, sans-serif" font-size="11" fill="#64748b">&#8226; Image: redis:7.2-alpine</text>
+        <text x="352" y="313" font-family="-apple-system, sans-serif" font-size="11" fill="#64748b">&#8226; Appendonly Persistence</text>
+        <text x="352" y="331" font-family="-apple-system, sans-serif" font-size="11" fill="#64748b">&#8226; Memory Limit: 128M</text>
+        <rect x="350" y="344" width="140" height="18" rx="4" fill="#fee2e2"/>
+        <text x="355" y="357" font-family="monospace" font-size="10" fill="#b91c1c">Internal only (:6379)</text>
+      </g>
+
+      <!-- 3. redis-exporter -->
+      <g filter="url(#cardShadow)">
+        <rect x="340" y="405" width="200" height="105" rx="10" fill="#ffffff" stroke="#ea580c" stroke-width="1.8"/>
+        <rect x="340" y="405" width="200" height="28" rx="10" fill="#ea580c"/>
+        <text x="352" y="424" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#ffffff">redis-exporter (Adapter)</text>
+        <text x="352" y="450" font-family="monospace" font-size="11" font-weight="600" fill="#0f172a">IP: 172.28.0.3:9121</text>
+        <text x="352" y="468" font-family="-apple-system, sans-serif" font-size="11" fill="#64748b">&#8226; Queries redis://redis:6379</text>
+        <text x="352" y="486" font-family="-apple-system, sans-serif" font-size="11" fill="#64748b">&#8226; Memory Limit: 64M</text>
+      </g>
+
+      <!-- 4. prometheus -->
+      <g filter="url(#cardShadow)">
+        <rect x="620" y="225" width="230" height="200" rx="10" fill="#ffffff" stroke="#e11d48" stroke-width="1.8"/>
+        <rect x="620" y="225" width="230" height="32" rx="10" fill="#e11d48"/>
+        <text x="632" y="246" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#ffffff">prometheus (TSDB)</text>
+        <text x="632" y="275" font-family="monospace" font-size="11" font-weight="600" fill="#0f172a">IP: 172.28.0.5:9090</text>
+        <text x="632" y="295" font-family="-apple-system, sans-serif" font-size="11" fill="#64748b">&#8226; prom/prometheus:v2.51.0</text>
+        <text x="632" y="313" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#e11d48">&#8226; Scrapes every 5s</text>
+        <text x="632" y="331" font-family="-apple-system, sans-serif" font-size="11" fill="#64748b">&#8226; Target: notes-app:8000</text>
+        <text x="632" y="349" font-family="-apple-system, sans-serif" font-size="11" fill="#64748b">&#8226; Target: redis-exporter:9121</text>
+        <text x="632" y="367" font-family="-apple-system, sans-serif" font-size="11" fill="#64748b">&#8226; Memory Limit: 256M</text>
+        <rect x="630" y="380" width="100" height="18" rx="4" fill="#ffe4e6"/>
+        <text x="635" y="393" font-family="monospace" font-size="10" fill="#9f1239">Host: :9090</text>
+      </g>
+
+      <!-- 5. grafana -->
+      <g filter="url(#cardShadow)">
+        <rect x="910" y="225" width="220" height="185" rx="10" fill="#ffffff" stroke="#d97706" stroke-width="1.8"/>
+        <rect x="910" y="225" width="220" height="32" rx="10" fill="#d97706"/>
+        <text x="922" y="246" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#ffffff">grafana (Visualization)</text>
+        <text x="922" y="275" font-family="monospace" font-size="11" font-weight="600" fill="#0f172a">IP: 172.28.0.6:3000</text>
+        <text x="922" y="295" font-family="-apple-system, sans-serif" font-size="11" fill="#64748b">&#8226; grafana/grafana:10.4.1</text>
+        <text x="922" y="313" font-family="-apple-system, sans-serif" font-size="11" fill="#64748b">&#8226; Auto-provisioned Prom DS</text>
+        <text x="922" y="331" font-family="-apple-system, sans-serif" font-size="11" fill="#64748b">&#8226; 6 Prebuilt SRE Panels</text>
+        <text x="922" y="349" font-family="-apple-system, sans-serif" font-size="11" fill="#64748b">&#8226; Memory Limit: 256M</text>
+        <rect x="920" y="362" width="100" height="18" rx="4" fill="#fef3c7"/>
+        <text x="925" y="375" font-family="monospace" font-size="10" fill="#92400e">Host: :3000</text>
+      </g>
+
+      <!-- Flow Connectors (Arrows) in Docker Layer -->
+      <!-- Host to notes-app -->
+      <path d="M 580 98 L 580 130 L 180 130 L 180 220" fill="none" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow)"/>
+      <text x="210" y="145" font-family="-apple-system, sans-serif" font-size="10" font-weight="600" fill="#0284c7">HTTP Requests / UI CRUD</text>
+
+      <!-- notes-app to redis -->
+      <path d="M 290 280 L 335 280" fill="none" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow)"/>
+      <text x="296" y="273" font-family="-apple-system, sans-serif" font-size="9" font-weight="700" fill="#0284c7">hset/hget</text>
+
+      <!-- redis-exporter to redis -->
+      <path d="M 440 405 L 440 380" fill="none" stroke="#ea580c" stroke-width="1.8" marker-end="url(#arrowOrange)"/>
+      <text x="445" y="396" font-family="-apple-system, sans-serif" font-size="9" font-weight="700" fill="#ea580c">poll</text>
+
+      <!-- prometheus scraping notes-app (routed around redis box) -->
+      <path d="M 620 255 L 575 255 L 575 208 L 315 208 L 315 255 L 295 255" fill="none" stroke="#e11d48" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrowRed)"/>
+      <rect x="365" y="198" width="165" height="20" rx="4" fill="#ffffff" stroke="#e11d48" stroke-width="1.2" filter="url(#cardShadow)"/>
+      <text x="447" y="212" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" font-weight="700" fill="#e11d48">GET /metrics (5s loop)</text>
+
+      <!-- prometheus scraping redis-exporter -->
+      <path d="M 620 350 L 580 350 L 580 440 L 545 440" fill="none" stroke="#e11d48" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrowRed)"/>
+      <text x="585" y="420" font-family="-apple-system, sans-serif" font-size="10" font-weight="700" fill="#e11d48">5s scrape</text>
+
+      <!-- grafana querying prometheus -->
+      <path d="M 910 290 L 855 290" fill="none" stroke="#d97706" stroke-width="2" marker-end="url(#arrowOrange)"/>
+      <text x="860" y="280" font-family="-apple-system, sans-serif" font-size="9" font-weight="700" fill="#d97706">PromQL</text>
+
+      <!-- Host to Grafana -->
+      <path d="M 1010 98 L 1010 220" fill="none" stroke="#d97706" stroke-width="2" marker-end="url(#arrowOrange)"/>
+
+      <!-- Host to Prometheus -->
+      <path d="M 795 98 L 795 220" fill="none" stroke="#e11d48" stroke-width="2" marker-end="url(#arrowRed)"/>
+
+      <!-- ===================================================================== -->
+      <!-- SECTION 3: AZURE CONTAINER INSTANCES (ACI) CLOUD ARCHITECTURE        -->
+      <!-- ===================================================================== -->
+      <rect x="40" y="560" width="1120" height="230" rx="16" fill="url(#azureGrad)" stroke="#0284c7" stroke-width="1.8"/>
+      <text x="60" y="590" font-family="-apple-system, sans-serif" font-size="15" font-weight="800" fill="#0f172a">☁️ Production Cloud: Serverless Azure Container Instances (ACI)</text>
+      <text x="60" y="608" font-family="-apple-system, sans-serif" font-size="12" fill="#475569">
+        Region: southeastasia (Azure for Students Permitted) &#8226; Resource Group: rg-observability-sea &#8226; Total: 1.0 CPU / 1.5 GB RAM (~$0.01 / test)
+      </text>
+
+      <!-- Container Group Boundary -->
+      <rect x="70" y="625" width="1060" height="145" rx="12" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="5,4" filter="url(#cardShadow)"/>
+      <text x="85" y="648" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#334155">
+        azurerm_container_group.aci (Shared Localhost Network Namespace: 127.0.0.1)
+      </text>
+
+      <!-- ACI Container 1: Prometheus -->
+      <rect x="90" y="660" width="300" height="95" rx="8" fill="#fff1f2" stroke="#f43f5e" stroke-width="1.2"/>
+      <text x="105" y="682" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#be123c">prom/prometheus:v2.51.0</text>
+      <text x="105" y="700" font-family="-apple-system, sans-serif" font-size="11" fill="#475569">&#8226; Allocation: 0.5 vCPU | 0.5 GB RAM</text>
+      <text x="105" y="718" font-family="-apple-system, sans-serif" font-size="11" fill="#475569">&#8226; Mounts secret volume: /etc/prometheus</text>
+      <text x="105" y="736" font-family="monospace" font-size="11" font-weight="700" fill="#be123c">&#8226; Public FQDN Port :9090</text>
+
+      <!-- ACI Container 2: Redis -->
+      <rect x="420" y="660" width="280" height="95" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="1.2"/>
+      <text x="435" y="682" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#991b1b">redis:7.2-alpine</text>
+      <text x="435" y="700" font-family="-apple-system, sans-serif" font-size="11" fill="#475569">&#8226; Allocation: 0.3 vCPU | 0.5 GB RAM</text>
+      <text x="435" y="718" font-family="-apple-system, sans-serif" font-size="11" fill="#475569">&#8226; Internal loopback: 127.0.0.1:6379</text>
+      <text x="435" y="736" font-family="-apple-system, sans-serif" font-size="11" fill="#475569">&#8226; In-memory non-persistent</text>
+
+      <!-- ACI Container 3: Redis Exporter -->
+      <rect x="730" y="660" width="280" height="95" rx="8" fill="#fff7ed" stroke="#f97316" stroke-width="1.2"/>
+      <text x="745" y="682" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" fill="#9a3412">redis_exporter:v1.58.0-alpine</text>
+      <text x="745" y="700" font-family="-apple-system, sans-serif" font-size="11" fill="#475569">&#8226; Allocation: 0.2 vCPU | 0.5 GB RAM</text>
+      <text x="745" y="718" font-family="-apple-system, sans-serif" font-size="11" fill="#475569">&#8226; Scrapes redis://localhost:6379</text>
+      <text x="745" y="736" font-family="-apple-system, sans-serif" font-size="11" fill="#475569">&#8226; Port: 127.0.0.1:9121</text>
+
+      <!-- ACI Public Endpoint Callout -->
+      <rect x="1030" y="660" width="90" height="95" rx="8" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.2"/>
+      <text x="1040" y="695" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#0369a1">Public</text>
+      <text x="1040" y="710" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#0369a1">FQDN</text>
+      <text x="1040" y="728" font-family="monospace" font-size="10" fill="#0284c7">:9090</text>
+    </svg>
+  </div>
+
+</body>
+</html>

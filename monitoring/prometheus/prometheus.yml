@@ -1,0 +1,37 @@
+# ==============================================================================
+# Prometheus Configuration
+# Containerized Monitoring & Observability Stack
+# ==============================================================================
+
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+  scrape_timeout: 4s
+
+scrape_configs:
+  # Job 1: Prometheus internal performance metrics
+  - job_name: "prometheus"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ["localhost:9090"]
+        labels:
+          environment: "production"
+          service: "prometheus-server"
+
+  # Job 2: CloudNotes FastAPI Microservice custom application metrics
+  - job_name: "notes-app"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ["notes-app:8000"]
+        labels:
+          environment: "production"
+          service: "cloudnotes-microservice"
+
+  # Job 3: Redis Exporter cache and system metrics
+  - job_name: "redis-exporter"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ["redis-exporter:9121"]
+        labels:
+          environment: "production"
+          service: "redis-cache-exporter"

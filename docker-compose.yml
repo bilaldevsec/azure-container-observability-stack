@@ -1,0 +1,158 @@
+# ==============================================================================
+# Containerized Monitoring & Observability Stack
+# Architecture: FastAPI + Redis + Redis Exporter + Prometheus + Grafana
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # Service 1: Redis In-Memory Data Store & Cache
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    expose:
+      - "6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - observability-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 2s
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+
+  # ----------------------------------------------------------------------------
+  # Service 2: Redis Prometheus Exporter
+  # ----------------------------------------------------------------------------
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.58.0-alpine
+    container_name: redis-exporter
+    restart: unless-stopped
+    environment:
+      - REDIS_ADDR=redis://redis:6379
+    expose:
+      - "9121"
+    ports:
+      - "9121:9121"
+    networks:
+      - observability-net
+    depends_on:
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+
+  # ----------------------------------------------------------------------------
+  # Service 3: CloudNotes FastAPI Microservice
+  # ----------------------------------------------------------------------------
+  notes-app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    image: cloudnotes-app:latest
+    container_name: notes-app
+    restart: unless-stopped
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "8000:8000"
+    networks:
+      - observability-net
+    depends_on:
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  # ----------------------------------------------------------------------------
+  # Service 4: Prometheus TSDB Monitoring Server
+  # ----------------------------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: prometheus
+    restart: unless-stopped
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+      - "--web.enable-lifecycle"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - observability-net
+    depends_on:
+      notes-app:
+        condition: service_started
+      redis-exporter:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  # ----------------------------------------------------------------------------
+  # Service 5: Grafana Telemetry Visualization Dashboards
+  # ----------------------------------------------------------------------------
+  grafana:
+    image: grafana/grafana:10.4.1
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    networks:
+      - observability-net
+    depends_on:
+      prometheus:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+# ------------------------------------------------------------------------------
+# Isolated Bridge Network Definition
+# ------------------------------------------------------------------------------
+networks:
+  observability-net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+
+# ------------------------------------------------------------------------------
+# Persistent Volume Declarations
+# ------------------------------------------------------------------------------
+volumes:
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
